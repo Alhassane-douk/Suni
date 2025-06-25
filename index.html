@@ -1,22 +1,139 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Comparateur de Notes</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Analyse Littéraire - Voltaire & Victor Hugo</title>
+  <style>
+    body {
+      font-family: 'Georgia', serif;
+      background: #f9f6f1;
+      color: #2c2c2c;
+      padding: 2rem;
+      max-width: 800px;
+      margin: auto;
+    }
+    h1, h2 {
+      text-align: center;
+      color: #6d1b1b;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1em;
+      border: 1px solid #ccc;
+      margin-bottom: 1rem;
+    }
+    button {
+      display: block;
+      margin: 1rem auto;
+      padding: 10px 20px;
+      font-size: 1em;
+      background-color: #6d1b1b;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    .result {
+      margin-top: 2rem;
+      padding: 1rem;
+      background: #fff;
+      border-left: 5px solid #6d1b1b;
+    }
+    .label {
+      font-weight: bold;
+      margin-bottom: 0.5rem;
+    }
+  </style>
 </head>
 <body>
-  <h1>Compare tes notes à Einstein 📘</h1>
 
-  <form id="notes-form">
-    <label>Maths : <input type="number" name="maths" required /></label><br>
-    <label>Physique : <input type="number" name="physique" required /></label><br>
-    <label>Chimie : <input type="number" name="chimie" required /></label><br>
-    <button type="submit">Comparer</button>
-  </form>
+  <h1>Analyse Littéraire</h1>
+  <h2>Style de Voltaire & Victor Hugo + Émotion</h2>
 
-  <div id="resultat"></div>
+  <p>Entrez un texte à analyser :</p>
+  <textarea id="userInput" placeholder="Écrivez un passage ici..."></textarea>
+  <button onclick="genererAnalyse()">Analyser le texte</button>
 
-  <script src="script.js"></script>
+  <div id="resultats"></div>
+
+  <script>
+    function detecterEmotion(text) {
+      // Simple détection par mots-clés (remplaçable par un modèle plus tard)
+      const emotions = {
+        "joie": ["heureux", "joie", "content", "bonheur", "sourire"],
+        "tristesse": ["triste", "solitude", "pleurer", "vide", "perdu"],
+        "colère": ["haine", "rage", "fureur", "colère", "injure"],
+        "peur": ["peur", "angoisse", "terreur", "tremble", "menace"],
+        "espoir": ["espoir", "rêve", "avenir", "lumière", "foi"]
+      };
+
+      let scores = {
+        "joie": 0,
+        "tristesse": 0,
+        "colère": 0,
+        "peur": 0,
+        "espoir": 0
+      };
+
+      const lowerText = text.toLowerCase();
+      for (let emotion in emotions) {
+        emotions[emotion].forEach(mot => {
+          if (lowerText.includes(mot)) {
+            scores[emotion]++;
+          }
+        });
+      }
+
+      // Trouver l'émotion dominante
+      let max = 0;
+      let emotionDominante = "neutre";
+      for (let em in scores) {
+        if (scores[em] > max) {
+          max = scores[em];
+          emotionDominante = em;
+        }
+      }
+
+      return emotionDominante;
+    }
+
+    function genererAnalyse() {
+      const texte = document.getElementById('userInput').value;
+
+      if (!texte.trim()) {
+        alert("Merci de saisir un texte à analyser.");
+        return;
+      }
+
+      const emotion = detecterEmotion(texte);
+
+      // Simuler la génération par style littéraire
+      const styleVictorHugo = "Victor Hugo dirait : Le peuple gémit, l’espérance dans l’ombre rallume son feu sacré.";
+      const styleVoltaire = "Voltaire répliquerait : Le peuple souffre, certes, mais pensons à en rire, sans perdre l’esprit.";
+
+      // Affichage
+      document.getElementById('resultats').innerHTML = `
+        <div class="result">
+          <div class="label">Texte original :</div>
+          <div>${texte}</div>
+        </div>
+        <div class="result">
+          <div class="label">Émotion dominante détectée :</div>
+          <div>${emotion.toUpperCase()}</div>
+        </div>
+        <div class="result">
+          <div class="label">Version Victor Hugo :</div>
+          <div>${styleVictorHugo}</div>
+        </div>
+        <div class="result">
+          <div class="label">Version Voltaire :</div>
+          <div>${styleVoltaire}</div>
+        </div>
+      `;
+    }
+  </script>
+
 </body>
 </html>
