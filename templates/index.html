@@ -1,0 +1,31 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <title>Stylish Rewriter</title>
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <h1>Stylish Rewriter</h1>
+    <textarea id="inputText" placeholder="Écris ton texte ici..."></textarea>
+    <button onclick="reformText()">Reformuler</button>
+    <div id="outputBox">
+        <h3>Texte Reformulé :</h3>
+        <p id="result"></p>
+    </div>
+    <script>
+        async function reformText() {
+            const text = document.getElementById('inputText').value;
+            const response = await fetch('/reform', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({ text })
+            });
+
+            const data = await response.json();
+            document.getElementById('result').innerText = data.result || data.error;
+        }
+    </script>
+</body>
+</html>
