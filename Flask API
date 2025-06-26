@@ -1,0 +1,37 @@
+from flask import Flask, request, jsonify
+from gpt_style import gpt_reformuler, AUTEURS
+
+app = Flask(__name__)
+
+@app.route("/", methods=["GET"])
+def index():
+    return jsonify({
+        "message": "Bienvenue sur GPT-Stylo ! POST vers /reformuler avec un texte et un style.",
+        "styles_disponibles": list(AUTEURS.keys())
+    })
+
+@app.route("/reformuler", methods=["POST"])
+def reformuler():
+    data = request.get_json()
+
+    texte = data.get("texte", "").strip()
+    style = data.get("style", "hugo").lower()
+
+    if not texte:
+        return jsonify({"error": "Aucun texte fourni."}), 400
+
+    if style not in AUTEURS:
+        return jsonify({"error": f"Style inconnu. Choisissez parmi {list(AUTEURS.keys())}"}), 400
+
+    try:
+        resultat = gpt_reformuler(texte, style)
+        return jsonify({
+            "original": texte,
+            "style": style,
+            "reformule": resultat
+        })
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
+
+if __name__ == "__main__":
+    app.run(debug=True, host="0.0.0.0", port=5000)
