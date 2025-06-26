@@ -69,3 +69,8 @@ Content-Type: application/json
   "texte": "Je suis très fatigué de cette vie quotidienne.",
   "style": "baudelaire"
 }
+{
+  "original": "Je suis très fatigué de cette vie quotidienne.",
+  "style": "baudelaire",
+  "reformule": "Je traîne ma lassitude comme un cadavre tiède dans la pénombre des jours répétés..."
+}
