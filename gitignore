@@ -1,1 +1,62 @@
+# Environnements virtuels
+venv/
+env/
+.venv/
+ENV/
 
+# Fichiers Python compilés
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Jetons et clés secrètes
+*.env
+.env
+.env.*
+
+# Fichiers de configuration système
+.DS_Store
+Thumbs.db
+
+# Logs et fichiers temporaires
+*.log
+*.tmp
+*.bak
+
+# Sorties de tests ou rapports
+htmlcov/
+.coverage
+.tox/
+.pytest_cache/
+
+# Cache Jupyter
+.ipynb_checkpoints
+
+# Modèles téléchargés ou générés
+models/
+checkpoints/
+*.bin
+*.pt
+*.h5
+
+# Dossiers d’IDE
+.vscode/
+.idea/
+
+# Fichiers OpenAI ou API clés privées
+openai_api_key.txt
+secret_config.json
+
+# Dépendances installées (si tu ne veux pas les suivre)
+__pypackages__/
+site-packages/
+
+# Requêtes exportées (Postman, Insomnia)
+*.postman_collection.json
+
+# fichiers spécifiques Hugging Face
+*.safetensors
+tokenizer_config.json
+special_tokens_map.json
+merges.txt
+vocab.json
