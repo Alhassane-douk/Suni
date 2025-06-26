@@ -1,76 +1,49 @@
-
-from flask import Flask, request, jsonify
+from flask import Flask, render_template, request, jsonify
 from transformers import pipeline
-import logging
+import json
+import os
 
 app = Flask(__name__)
 
-# Configuration du logger pour le debug
-logging.basicConfig(level=logging.INFO)
-logger = logging.getLogger(__name__)
+# NLP pipeline
+rephraser = pipeline("text2text-generation", model="Vamsi/T5_Paraphrase_Paws")
 
-# Chargement du modèle de reformulation (tu peux changer par un modèle plus littéraire si besoin)
-logger.info("Chargement du modèle de reformulation...")
-reformulateur = pipeline(
-    "text2text-generation",
-    model="Vamsi/T5_Paraphrase_Paws",  # À personnaliser plus tard
-    tokenizer="Vamsi/T5_Paraphrase_Paws"
-)
-logger.info("Modèle chargé avec succès.")
+# Charger les textes enregistrés
+SAVE_FILE = "saved_texts.json"
+if not os.path.exists(SAVE_FILE):
+    with open(SAVE_FILE, 'w') as f:
+        json.dump([], f)
 
-@app.route("/", methods=["GET"])
-def index():
-    return jsonify({
-        "message": "Bienvenue dans l'API de reformulation littéraire ! Utilisez /reformuler en POST."
-    })
+@app.route('/')
+def home():
+    return render_template('index.html')
 
-@app.route("/reformuler", methods=["POST"])
-def reformuler_texte():
+@app.route('/reform', methods=['POST'])
+def reform_text():
     data = request.get_json()
+    input_text = data.get("text")
 
-    if not data or 'texte' not in data:
-        return jsonify({"error": "Aucun texte fourni."}), 400
+    if not input_text:
+        return jsonify({"error": "Texte vide"}), 400
 
-    texte_original = data['texte'].strip()
+    reformulated = rephraser(f"paraphrase: {input_text}", max_length=200, do_sample=True, top_k=120, top_p=0.95, num_return_sequences=1)
 
-    if not texte_original:
-        return jsonify({"error": "Le texte est vide."}), 400
+    output = reformulated[0]['generated_text']
 
-    try:
-        logger.info(f"Texte reçu : {texte_original}")
-        prompt = f"paraphrase: {texte_original} </s>"
-        resultat = reformulateur(
-            prompt,
-            max_length=120,
-            num_beams=5,
-            num_return_sequences=1,
-            temperature=1.5,
-            repetition_penalty=1.2
-        )
-        texte_reformule = resultat[0]['generated_text']
+    # Enregistrer dans le fichier
+    with open(SAVE_FILE, 'r+') as f:
+        saved = json.load(f)
+        saved.append({"original": input_text, "reformulated": output})
+        f.seek(0)
+        json.dump(saved, f, indent=4)
 
-        logger.info(f"Texte reformulé : {texte_reformule}")
+    return jsonify({"result": output})
 
-        return jsonify({
-            "original": texte_original,7
-            "reformule": texte_reformule
-        })
+@app.route('/saved')
+def get_saved():
+    with open(SAVE_FILE) as f:
+        saved = json.load(f)
+    return jsonify(saved)
 
-    except Exception as e:
-        logger.error(f"Erreur lors de la reformulation : {str(e)}")
-        return jsonify({"error": "Une erreur est survenue lors de la reformulation."}), 500
-
-if __name__ == "__main__":
-    app.run(debug=True, host="0.0.0.0", port=5000)
-    POST http://localhost:5000/reformuler
-Content-Type: application/json
-
-{
-  "texte": "Je suis très fatigué de cette vie quotidienne.",
-  "style": "baudelaire"
-}
-{
-  "original": "Je suis très fatigué de cette vie quotidienne.",
-  "style": "baudelaire",
-  "reformule": "Je traîne ma lassitude comme un cadavre tiède dans la pénombre des jours répétés..."
-}
+if __name__ == '__main__':
+    app.run(debug=True)
