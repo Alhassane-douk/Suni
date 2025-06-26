@@ -52,7 +52,7 @@ def reformuler_texte():
         logger.info(f"Texte reformulé : {texte_reformule}")
 
         return jsonify({
-            "original": texte_original,
+            "original": texte_original,7
             "reformule": texte_reformule
         })
 
@@ -62,3 +62,10 @@ def reformuler_texte():
 
 if __name__ == "__main__":
     app.run(debug=True, host="0.0.0.0", port=5000)
+    POST http://localhost:5000/reformuler
+Content-Type: application/json
+
+{
+  "texte": "Je suis très fatigué de cette vie quotidienne.",
+  "style": "baudelaire"
+}
